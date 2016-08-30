@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 import rospy
+from math import *
+import csv
 from myo_msgs.msg import statusMessage
 
 class simpleListener:
@@ -9,26 +11,59 @@ class simpleListener:
         self.count = 0
         self.avgVel = 0;
         self.maxVel = 0;
+        self.nrBins = 100
+        self.binRange = 100000
+        self.targetT = 1000000
+
+        # if binNr is not even, make it even
+        if (self.nrBins % 2 == 1):
+            self.nrBins += 1
+
+        # calculate size of bin Target
+        self.binSizeT = 2*self.binRange/self.nrBins
+
+        # init list of bins
+        self.bucket = [0] *(self.nrBins+1)
 
     def callback(self,data):
         #print "velocity was ", data.velocity
         self.avgdt = 0.01*data.dt.nsecs + 0.99*self.avgdt
         self.avgVel = 0.01*data.velocity + 0.99*self.avgVel
-        if abs(data.dt.nsecs + data.dt.secs*1e9) >self.maxdt:
-            self.maxdt = abs(data.dt.nsecs + data.dt.secs*1e9)
-            print "New self.maxdt! ",self.maxdt/1e6 , " ms"
-        if abs(data.velocity) >self.maxVel:
-            self.maxVel = abs(data.velocity)
-            print "New self.maxVel! ",self.maxVel , " Enc/s"
-        if self.count>10000:
-            print "Average: ", self.avgdt/1e6 , " ms | Maximum: ",self.maxdt/1e6 , " ms"
-            print "Average: ", self.avgVel , " Enc/s | Maximum: ",self.maxVel , " Enc/s"
-            self.count = 0;
-        self.count = self.count +1
+
+        # calculate binNr of sample
+        tmp=((data.dt.nsecs + data.dt.secs*1000000000) - self.targetT)//self.binSizeT
+        #print "Tmp was ", tmp
+        if tmp < -self.nrBins//2:
+            tmp = -self.nrBins//2
+        elif tmp > self.nrBins//2:
+            tmp = self.nrBins//2
+        self.bucket[self.nrBins//2 + tmp] += 1
+
+        if self.count > 10000:
+            print "-------------------------------------"
+            print "----------- New Histogram -----------"
+            print "-------------------------------------"
+            print " "
+            self.count = 0
+            for i in xrange(0,self.nrBins+1):
+                print ((i-self.nrBins//2)*self.binSizeT/1000) , " us : " , self.bucket[i]
+            with open('data.csv','wb') as csvfile:
+                writer = csv.writer(csvfile,delimiter='\t', quotechar='\'',quoting=csv.QUOTE_MINIMAL)
+                writer.writerow(['NrBins',self.nrBins, 'binRange', self.binRange, 'Target',self.targetT])
+                writer.writerow(['Bin', 'SampleNr'])
+                for i in xrange(0,self.nrBins+1):
+                    writer.writerow([i-self.nrBins//2, self.bucket[i] ])
+
+        #print self.count
+        self.count +=1
+
+
+
+
 
     def listener(self):
         rospy.init_node('listener',anonymous=True)
-
+        print "starting up logger ..."
 
         rospy.Subscriber("/myo/myo_muscle0_controller/DebugMessage",statusMessage,self.callback)
 
