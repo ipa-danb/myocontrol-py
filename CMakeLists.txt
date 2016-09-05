@@ -6,6 +6,7 @@ project(testall)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   myo_control
+  myo_msgs
   rospy
 )
 
