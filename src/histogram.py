@@ -45,8 +45,8 @@ class simpleListener:
             print "-------------------------------------"
             print " "
             self.count = 0
-            for i in xrange(0,self.nrBins+1):
-                print ((i-self.nrBins//2)*self.binSizeT/1000) , " us : " , self.bucket[i]
+            for i in xrange(0,(self.nrBins)/2+1):
+                print ((i-self.nrBins//2)*self.binSizeT/1000) , " us : " , self.bucket[i] , " | " , ( -1*(i-self.nrBins//2)*self.binSizeT/1000 ) , " us : " , self.bucket[self.nrBins -i]
             with open('data.csv','wb') as csvfile:
                 writer = csv.writer(csvfile,delimiter='\t', quotechar='\'',quoting=csv.QUOTE_MINIMAL)
                 writer.writerow(['NrBins',self.nrBins, 'binRange', self.binRange, 'Target',self.targetT])
