@@ -5,7 +5,7 @@ import sys
 
 import curses
 import rospy
-from myo_msgs.srv import SetVelocity
+from myo_msgs.srv import SetReference
 
 #from PySide.QtCore import *
 #from PySide.QtGui import *
@@ -14,6 +14,7 @@ from myo_msgs.srv import SetVelocity
 ref = 0
 
 def main(stdscr):
+    """Checks for keyboardpresses and in-/decreases displacement reference"""
     stdscr.nodelay(1)
     global ref
     while True:
@@ -32,9 +33,10 @@ def main(stdscr):
 
 
 def setReference(displacement):
-    rospy.wait_for_service('/myo/myo_muscle0_controller/set_velocity')
+    """Calls RosService /myo/myo_muscle0_controller/set_reference to set Displacement """
+    rospy.wait_for_service('/myo/myo_muscle0_controller/set_reference')
     try:
-        sDsp = rospy.ServiceProxy('/myo/myo_muscle0_controller/set_velocity',SetVelocity)
+        sDsp = rospy.ServiceProxy('/myo/myo_muscle0_controller/set_reference',SetReference)
         sDsp(displacement)
     except rospy.ServiceException, e:
         print " "
