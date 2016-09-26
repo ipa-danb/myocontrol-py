@@ -16,26 +16,32 @@ def setReference(ref):
 
 if __name__ == '__main__':
     # parameter
-    maxRef  = 50
+    maxRef  = 1000
     zRef    = 0
-    wTime   = 10
+    wTime   = 8
     runs    = 10
 
     print "starting to drive trajectory... "
+    setReference(-2000)
+    time.sleep(2)
+    setReference(-3889)
 
-    for i in range(0,runs):
-        print "Run ", i , " of ", runs
-        setReference(zRef)
-        time.sleep(wTime)
+    for i in range(-3800,3800,50):
+        setReference(i)
+        time.sleep(1)
 
-        setReference(maxRef)
-        time.sleep(wTime)
+    setReference(2000)
+    time.sleep(2)
+    setReference(0)
+    time.sleep(2)
+    setReference(-300)
+    for i in range(-300,300):
+        setReference(i)
+        time.sleep(0.5)
+    for i in range(300,-300):
+        setReference(i)
+        time.sleep(0.5)
 
-        setReference(zRef)
-        time.sleep(wTime)
-
-        setReference(-maxRef)
-        time.sleep(wTime)
-
-    setReference(zRef)
     print "finished with trajectory"
+    time.sleep(2)
+    setReference(0)

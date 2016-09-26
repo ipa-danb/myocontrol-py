@@ -6,6 +6,7 @@ import sys
 import curses
 import rospy
 from myo_msgs.srv import SetReference
+from myo_msgs.srv import SetClutch
 
 #from PySide.QtCore import *
 #from PySide.QtGui import *
@@ -21,9 +22,9 @@ def main(stdscr):
         c = stdscr.getch()
         if c!= -1:
             if c == 259:
-                ref += 1
+                ref = 1
             elif c == 258:
-                ref += -1
+                ref = 0
             setReference(ref)
             stdscr.clear()
             stdscr.refresh()
@@ -34,9 +35,9 @@ def main(stdscr):
 
 def setReference(reference):
     """Calls RosService /myo/myo_muscle0_controller/set_reference to set Displacement """
-    rospy.wait_for_service('/myo/myo_muscle0_controller/set_reference')
+    rospy.wait_for_service('/myo/myo_muscle0_controller/set_clutch')
     try:
-        sDsp = rospy.ServiceProxy('/myo/myo_muscle0_controller/set_reference',SetReference)
+        sDsp = rospy.ServiceProxy('/myo/myo_muscle0_controller/set_clutch',SetClutch)
         sDsp(reference)
     except rospy.ServiceException, e:
         print " "
