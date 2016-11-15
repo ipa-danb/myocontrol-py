@@ -35,9 +35,9 @@ def main(stdscr):
 
 def setReference(reference):
     """Calls RosService /myo/myo_muscle0_controller/set_reference to set Displacement """
-    rospy.wait_for_service('/myo/myo_muscle0_controller/set_clutch')
+    rospy.wait_for_service('/myo/myo_muscle0_controller/set_clt')
     try:
-        sDsp = rospy.ServiceProxy('/myo/myo_muscle0_controller/set_clutch',SetClutch)
+        sDsp = rospy.ServiceProxy('/myo/myo_muscle0_controller/set_clt',SetClutch)
         sDsp(reference)
     except rospy.ServiceException, e:
         print " "
