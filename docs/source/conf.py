@@ -31,7 +31,6 @@
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
-    'sphinx.ext.imgmath',
     'sphinx.ext.githubpages',
 ]
 
