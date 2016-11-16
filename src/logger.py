@@ -62,7 +62,7 @@ class simpleLogger:
         self.buffer = []
 
         rospy.init_node('logger',anonymous=True)
-        print "starting up logger ..."
+        print "\nstarting up logger ..."
         self.subsC = rospy.Subscriber(rosNode,statusMessage,self.callback)
 
     def __enter__(self):
@@ -70,14 +70,14 @@ class simpleLogger:
 
     def __exit__(self,exc_type, exc_val, exc_tb):
         print "#####################"
-        print "stopping logger ..."
+        print "stopping logger ... \n"
         self.dataSize += self.count
         with open(self.fileName,'a') as csvfile:
             writer = csv.writer(csvfile,delimiter='\t', quotechar='\'',quoting=csv.QUOTE_MINIMAL)
-            print '{:10s} {:10d}'.format('Final #Samples:',self.dataSize)
+            print '{:10s} {:10d}'.format('Final logged #Samples:',self.dataSize)
             for row in self.buffer:
                 writer.writerow(row)
-        print " "
+        print "#####################\n"
         self.subsC.unregister()
 
 
