@@ -345,7 +345,7 @@ texinfo_documents = [
 import sys
 import mock
 
-MOCK_MODULES = ['pyside', 'matplotlib.figure', 'myo_msgs.srv.SetReference', 'myo_msgs.msg.statusMessage','myo_msgs.srv.SetClutch']
+MOCK_MODULES = ['rospy','pyside', 'matplotlib.figure', 'myo_msgs.srv.SetReference', 'myo_msgs.msg.statusMessage','myo_msgs.srv.SetClutch']
 for mod_name in MOCK_MODULES:
     sys.modules[mod_name] = mock.Mock()
 
