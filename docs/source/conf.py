@@ -350,5 +350,5 @@ class Mock(MagicMock):
     def __getattr__(cls, name):
             return Mock()
 
-MOCK_MODULES = ['rospy']
+MOCK_MODULES = ['rospy','pyside']
 sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
