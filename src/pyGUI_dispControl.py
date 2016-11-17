@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 # Import PySide classes
 import sys
 import matplotlib

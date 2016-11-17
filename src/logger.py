@@ -1,11 +1,3 @@
-"""
-.. module:: logger
-    :platform: Unix
-    :synopsis: A module containing
-.. moduleauthoer:: Daniel Bargmann <daniel.bargmann@ipa.fraunhofer.de>
-
-"""
-
 import rospy
 from math import *
 import time
@@ -37,8 +29,6 @@ class simpleLogger:
     count : int
     dataSize : int
     buffer : array
-
-
 
     """
 
