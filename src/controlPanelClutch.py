@@ -25,7 +25,7 @@ def main(stdscr):
                 ref = 1
             elif c == 258:
                 ref = 0
-            setReference(ref)
+            setCLT(ref)
             stdscr.clear()
             stdscr.refresh()
             stdscr.move(0,0)
@@ -33,7 +33,7 @@ def main(stdscr):
 
 
 
-def setReference(reference):
+def setCLT(reference):
     """Calls RosService /myo/myo_muscle0_controller/set_reference to set Displacement """
     rospy.wait_for_service('/myo/myo_muscle0_controller/set_clt')
     try:
