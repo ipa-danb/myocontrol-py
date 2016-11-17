@@ -1,10 +1,9 @@
-MYO Robotics Python Modules
-=============================
+src
+===
 
 .. toctree::
    :maxdepth: 4
 
-   compareVel
    controlPanel
    controlPanelClutch
    histogram
