@@ -34,8 +34,10 @@ Notes
 # Import PySide classes
 import sys
 import matplotlib
+"""
 matplotlib.use('Qt4Agg')
 matplotlib.rcParams['backend.qt4']='PySide'
+"""
 
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas

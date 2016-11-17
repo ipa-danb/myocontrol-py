@@ -343,12 +343,29 @@ texinfo_documents = [
 # texinfo_no_detailmenu = False
 
 import sys
-from mock import Mock as MagicMock
+import mock
 
-class Mock(MagicMock):
-    @classmethod
-    def __getattr__(cls, name):
-            return Mock()
+MOCK_MODULES = ['pyside', 'matplotlib.figure', 'myo_msgs.srv.SetReference', 'myo_msgs.msg.statusMessage','myo_msgs.srv.SetClutch']
+for mod_name in MOCK_MODULES:
+    sys.modules[mod_name] = mock.Mock()
 
-MOCK_MODULES = ['rospy','pyside','myo_msgs.srv']
-sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
+
+
+mock_qt_gui = mock.MagicMock(
+    QDialog=type('QDialog', (object,), {'__module__': 'PySide.QtGui'}),
+    QSortFilterProxyModel=type(
+        'QSortFilterProxyModel', (object,), {'__module__': 'PySide.QtGui'}
+     )
+ )
+mock_qt_core = mock.MagicMock(
+    QAbstractItemModel=type(
+        'QAbstractItemModel', (object,), {'__module__': 'PySide.QtCore'}
+    )
+)
+
+sys.modules.update({
+    'PySide': mock.MagicMock(QtGui=mock_qt_gui, QtCore=mock_qt_core),
+    'PySide.QtGui': mock_qt_gui,
+    'PySide.QtCore': mock_qt_core,
+    'riffle.resource': mock.MagicMock()
+})
