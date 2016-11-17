@@ -5,35 +5,59 @@ import csv
 import sys
 from myo_msgs.msg import statusMessage
 
-'''
-time     time
-float64  position
-float64  velocity
-float64  displacement
-float64  reference
-float64  current
-float64  commanded_effort
-float64  analogIN0
-int32    clutchState
-'''
+
 
 class simpleLogger:
     """Simple Logger class
 
-    This class is a simple logger, which takes
+    Logger for rostopic message of type statusMessage (contained in MYO Robotics ROS Package)
 
-    Attributes
-    ----------
-    fileName : string
-    bufferSize : int
-    count : int
-    dataSize : int
-    buffer : array
+    .. warning:: It logs data as long as it exists! It is recommended to only use it with a ressource manager.
+
+    Example
+    -------
+    Usually you would call this logger by using the ressource manager:
+
+    ::
+
+        import logger
+        with simpleLogger('FileName') as log:
+            #do something here, e.g. time.wait(10)
+
+
+    Notes
+    -----
+    statusMessage has the following structure:
+
+    ::
+
+        time     time
+        float64  position
+        float64  velocity
+        float64  displacement
+        float64  reference
+        float64  current
+        float64  commanded_effort
+        float64  analogIN0
+        int32    clutchState
+
 
     """
 
     def __init__(self,name, bufferSize=1000, rosNode="/myo/myo_muscle0_controller/DebugMessage"):
-        """
+        """Init function for simpleLogger class
+
+        Parameters
+        ----------
+        name : string
+            Name for logging file
+        bufferSize : int
+            Size of logging buffer. After bufferSize samples the buffer is written to the file
+        rosNode : string
+            ROS Node that gets logged
+            Notes
+            -----
+            Needs to be to be of type statusMessage
 
         """
         # create filename from date
@@ -72,6 +96,19 @@ class simpleLogger:
 
 
     def callback(self,data):
+        """Callback function for a ROS Message
+
+        This function fills a buffer up to Size `bufferSize` and writes them to their respective file
+
+        .. warning:: This function gets called automatically as long as this object exists. Hence it is recommended to use it with a ressource manager
+
+
+        Parameters
+        ----------
+        data : <statusMessage>
+            writes `data` to buffer
+
+        """
         self.buffer.append((data.time.nsecs,data.time.secs,data.position,data.velocity,data.displacement,data.reference,data.current,data.commanded_effort,data.analogIN0,data.clutchState))
         self.count +=1
         if self.count > self.bufferSize:

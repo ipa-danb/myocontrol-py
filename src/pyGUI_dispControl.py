@@ -1,3 +1,36 @@
+#!/usr/bin/env python
+"""This module contains classes for a simple GUI for Orthosis controller
+
+Depends on ROS (in particular rospy), pyside, QT4 and myo_msgs packages from MYO Robotics ROS package
+
+Example
+-------
+To compile this use
+
+    $ catkin_make
+
+In your catkin folder
+
+Pretty simple to use, just rosrun this class
+
+    $ rosrun myo_py pyGUI_dispControl.py
+
+Before you need to make the python file executable. Execute this in your source folder:
+
+    $ chmod +x pyGUI_dispControl.py
+
+You also need to source your MYO Robotics ROS package and your MYO Robotics ROS Python package.
+This can be done by
+
+    $ source devel/setup.sh
+
+in your respective catkin workspaces
+
+Notes
+-----
+    This is very experimental
+
+"""
 # Import PySide classes
 import sys
 import matplotlib
@@ -18,8 +51,24 @@ from PySide.QtCore import *
 from PySide.QtGui import *
 
 class MatplotlibWidget(FigureCanvas):
+    """Class for drawing and plotting Data on a Canvas with matplotLib and QT
 
+    """
     def __init__(self, parent=None,xlabel='x',ylabel='y',title='Title'):
+        """Init function for MatplotLibWidgets
+
+        Parameters
+        ----------
+        parent : QWidget
+            Parent widget where this canvas is embedded
+        xlabel : string
+            Label for x axis
+        ylabel : string
+            Label for y axis
+        title : string
+            Titel for canvas
+
+        """
         super(MatplotlibWidget, self).__init__(Figure())
 
         self.setParent(parent)
@@ -35,12 +84,37 @@ class MatplotlibWidget(FigureCanvas):
         self.before = (0,0)
 
     def plotDataPoints(self,x,y):
+        """Function to plot a data point on canvas without resetting it
+
+        This connects the new data point to the one before with a line
+
+        Parameters
+        ----------
+        x : float
+            Value of point on the x axis
+        y : float
+            Value of point on the y axis
+        """
         self.axes.plot([self.before[0],x],[self.before[1] ,y],'b-')
         self.before = (x,y)
         self.draw()
 
 class OrthosisGUI:
+    """GUI for Orthosis
+
+    This class contains all GUI elements, i.e. a knob and a progressbar as well
+    as buttons to connect the clutch and to start a logger.
+
+    """
     def __init__(self,geo):
+        """Init function for OrthosisGUI
+
+        Parameters
+        ----------
+        geo : List
+            Initial Geometry - List of [x,y,width,height]
+
+        """
         self.i          = 0
         self.before     = 5
 
@@ -104,12 +178,26 @@ class OrthosisGUI:
 
 
     def show(self):
+        """Function to execute and draw pyQT
+        """
         self.widget.show()
         self.app.exec_()
         sys.exit()
 
     def setReference(self,reference):
-        """Calls RosService /myo/myo_muscle0_controller/set_reference to set Displacement """
+        """Calls RosService set_ref to set Reference value
+
+        Parameters
+        ----------
+        reference : int
+            Reference Value
+
+        Raises
+        ------
+        ServiceException
+            If server for reference is not available
+
+        """
         rospy.wait_for_service('/myo/myo_muscle0_controller/set_ref')
         try:
             sDsp = rospy.ServiceProxy('/myo/myo_muscle0_controller/set_ref',SetReference)
@@ -118,6 +206,14 @@ class OrthosisGUI:
             print " "
 
     def setClutch(self):
+        """Calls RosService set_clt to toggle Clutch
+
+        Raises
+        ------
+        ServiceException
+            If server for clutch is not available
+
+        """
         rospy.wait_for_service('/myo/myo_muscle0_controller/set_clt')
         try:
             serv = rospy.ServiceProxy('/myo/myo_muscle0_controller/set_clt', SetClutch)
@@ -126,6 +222,8 @@ class OrthosisGUI:
             sys.exit("Error! Cant Set Clutch")
 
     def onClickLogger(self):
+        """Callback for Logger Button
+        """
         if self.logState == False:
             self.logIt = logger.simpleLogger("guiLog",bufferSize=1000)
             self.log.setText("Running...")
@@ -138,6 +236,8 @@ class OrthosisGUI:
 
 
     def onClick(self):
+        """Callback to toggle clutch
+        """
         self.setClutch()
         if self.state == 0:
             self.clutch.setText("Connect")
@@ -145,6 +245,8 @@ class OrthosisGUI:
             self.clutch.setText("Disconnect")
 
     def onChange(self):
+        """Callback for Dial Knob
+        """
         self.i += 1
         #print "value requested ", button.value()
         if abs(self.before -self.button.value()) > 5 :
@@ -158,7 +260,5 @@ class OrthosisGUI:
 
 
 if __name__ == '__main__':
-    gui = OrthosisGUI([300,300,300,300])
+    gui = OrthosisGUI([0,0,300,300])
     gui.show()
-
-    # Enter Qt application main loop
