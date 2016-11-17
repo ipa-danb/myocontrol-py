@@ -1,3 +1,2 @@
-rospy
 pyside
 matplotlib
