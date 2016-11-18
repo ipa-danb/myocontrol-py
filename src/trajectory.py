@@ -1,15 +1,14 @@
 #!/usr/bin/env python
 import rospy
 import time
-from myo_msgs.srv import SetReference
-from myo_msgs.srv import SetClutch
+import myo_msgs.srv
 import sys
 
 def setReference(ref):
     """Calls RosService /myo/myo_muscle0_controller/set_reference to set reference """
     rospy.wait_for_service('/myo/myo_muscle0_controller/set_reference')
     try:
-        sDsp = rospy.ServiceProxy('/myo/myo_muscle0_controller/set_reference',SetReference)
+        sDsp = rospy.ServiceProxy('/myo/myo_muscle0_controller/set_reference',myo_msgs.srv.SetReference)
         sDsp(ref)
     except rospy.ServiceException, e:
         print " "
@@ -27,7 +26,7 @@ if __name__ == '__main__':
     rospy.wait_for_service('/myo/myo_muscle0_controller/set_clutch')
 
     try:
-        serv = rospy.ServiceProxy('/myo/myo_muscle0_controller/set_clutch', SetClutch)
+        serv = rospy.ServiceProxy('/myo/myo_muscle0_controller/set_clutch', myo_msgs.srv.SetClutch)
         serv(0)
     except rospy.ServiceException, e:
         sys.exit("Error! Cant Set Clutch")

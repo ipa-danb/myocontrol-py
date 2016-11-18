@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 import rospy
 import time
-from myo_msgs.srv import SetReference
-from myo_msgs.srv import SetClutch
-import sys, getopt
-import threading
+import myo_msgs.srv
+import sys
+import getopt
 import logger
 import csv
 
@@ -23,7 +22,7 @@ class TrajectoryMover:
         """Calls RosService /myo/myo_muscle0_controller/set_reference to set reference """
         rospy.wait_for_service('/myo/myo_muscle0_controller/set_ref')
         try:
-            sDsp = rospy.ServiceProxy('/myo/myo_muscle0_controller/set_ref',SetReference)
+            sDsp = rospy.ServiceProxy('/myo/myo_muscle0_controller/set_ref',myo_msgs.srv.SetReference)
             sDsp(ref)
         except rospy.ServiceException, e:
             print " "
@@ -56,7 +55,7 @@ class TrajectoryMover:
     def setClutch(self,state):
         rospy.wait_for_service('/myo/myo_muscle0_controller/set_clt')
         try:
-            serv = rospy.ServiceProxy('/myo/myo_muscle0_controller/set_clt', SetClutch)
+            serv = rospy.ServiceProxy('/myo/myo_muscle0_controller/set_clt', myo_msgs.srv.SetClutch)
             serv(state)
         except rospy.ServiceException, e:
             sys.exit("Error! Cant Set Clutch")

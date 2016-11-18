@@ -2,15 +2,9 @@
 # -'''- coding: utf-8 -'''-
 
 import sys
-
 import curses
 import rospy
-from myo_msgs.srv import SetReference
-from myo_msgs.srv import SetClutch
-
-#from PySide.QtCore import *
-#from PySide.QtGui import *
-#from PySide.QtDeclarative import QDeclarativeView
+import myo_msgs.srv
 
 ref = 0
 
@@ -37,7 +31,7 @@ def setCLT(reference):
     """Calls RosService /myo/myo_muscle0_controller/set_reference to set Displacement """
     rospy.wait_for_service('/myo/myo_muscle0_controller/set_clt')
     try:
-        sDsp = rospy.ServiceProxy('/myo/myo_muscle0_controller/set_clt',SetClutch)
+        sDsp = rospy.ServiceProxy('/myo/myo_muscle0_controller/set_clt',myo_msgs.srv.SetClutch)
         sDsp(reference)
     except rospy.ServiceException, e:
         print " "
