@@ -8,7 +8,6 @@ import rospy
 import myo_msgs.srv
 import logger
 
-import pylab
 import PySide.QtGui
 import PySide.QtCore
 
