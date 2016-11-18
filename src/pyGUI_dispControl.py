@@ -2,98 +2,67 @@
 
 # Import PySide classes
 import sys
-import matplotlib
-matplotlib.use('Qt4Agg')
-matplotlib.rcParams['backend.qt4']='PySide'
-
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 
 import math
 import rospy
-from myo_msgs.srv import SetReference
-from myo_msgs.srv import SetClutch
+import myo_msgs.srv
 import logger
 
-import pylab
-from PySide.QtCore import *
-from PySide.QtGui import *
-
-class MatplotlibWidget(FigureCanvas):
-
-    def __init__(self, parent=None,xlabel='x',ylabel='y',title='Title'):
-        super(MatplotlibWidget, self).__init__(Figure())
-
-        self.setParent(parent)
-        self.figure = Figure()
-        self.canvas = FigureCanvas(self.figure)
-        self.axes = self.figure.add_subplot(111)
-
-        self.axes.set_xlabel(xlabel)
-        self.axes.set_ylim([0,160])
-        self.axes.set_xlim([0,1000])
-        self.axes.set_ylabel(ylabel)
-        self.axes.set_title(title)
-        self.before = (0,0)
-
-    def plotDataPoints(self,x,y):
-        self.axes.plot([self.before[0],x],[self.before[1] ,y],'b-')
-        self.before = (x,y)
-        self.draw()
+import PySide.QtGui
+import PySide.QtCore
 
 class OrthosisGUI:
     def __init__(self,geo):
         self.i          = 0
         self.before     = 5
 
-        self.app = QApplication(sys.argv)
-        self.DataPlot = MatplotlibWidget(xlabel='xv2',ylabel='yv2',title='')
+        self.app = PySide.QtGui.QApplication(sys.argv)
 
-        self.label = QLabel("<h1><b> 0 mNm </b></h1>")
-        self.label.setMinimumSize(QSize(100,10))
+        self.label = PySide.QtGui.QLabel("<h1><b> 0 mNm </b></h1>")
+        self.label.setMinimumSize(PySide.QtCore.QSize(100,10))
 
-        self.widget = QWidget()
-        self.widget.setMinimumSize(QSize(600,600))
+        self.widget = PySide.QtGui.QWidget()
+        self.widget.setMinimumSize(PySide.QtCore.QSize(600,600))
         self.widget.setWindowTitle('DisplacementControl')
 
-        self.bar = QProgressBar()
-        self.bar.setMinimumSize(QSize(75,450))
-        self.bar.setOrientation(Qt.Vertical)
+        self.bar = PySide.QtGui.QProgressBar()
+        self.bar.setMinimumSize(PySide.QtCore.QSize(75,450))
+        self.bar.setOrientation(PySide.QtCore.Qt.Vertical)
         self.bar.setMaximum(150)
         self.bar.setMinimum(5)
-        self.bar.setAlignment(Qt.AlignRight)
+        self.bar.setAlignment(PySide.QtCore.Qt.AlignRight)
 
-        self.button = QDial()
+        self.button = PySide.QtGui.QDial()
         self.button.setNotchesVisible(1)
         self.button.setMinimum(5)
         self.button.setMaximum(150)
         self.button.setValue(5)
         self.button.valueChanged.connect(self.onChange)
 
-        self.clutchLabel = QLabel("<b>ClutchState</b>")
+        self.clutchLabel = PySide.QtGui.QLabel("<b>ClutchState</b>")
 
-        self.clutch = QPushButton("Disconnect")
-        self.clutch.setMaximumSize(QSize(150,60))
+        self.clutch = PySide.QtGui.QPushButton("Disconnect")
+        self.clutch.setMaximumSize(PySide.QtCore.QSize(150,60))
         self.clutch.clicked.connect(self.onClick)
         self.state = 1
 
-        self.log = QPushButton("Log")
-        self.log.setMaximumSize(QSize(150,60))
+        self.log = PySide.QtGui.QPushButton("Log")
+        self.log.setMaximumSize(PySide.QtCore.QSize(150,60))
         self.log.clicked.connect(self.onClickLogger)
         self.logState = 0
 
-        self.vbox = QVBoxLayout()
+        self.vbox = PySide.QtGui.QVBoxLayout()
         self.vbox.addWidget(self.label)
         self.vbox.addWidget(self.bar)
 
-        self.vbox2 = QVBoxLayout()
+        self.vbox2 = PySide.QtGui.QVBoxLayout()
         self.vbox2.addStretch(1)
         self.vbox2.addWidget(self.clutchLabel)
         self.vbox2.addWidget(self.clutch)
         self.vbox2.addWidget(self.log)
         self.vbox2.addStretch(1)
 
-        self.hbox  = QHBoxLayout()
+        self.hbox  = PySide.QtGui.QHBoxLayout()
         self.hbox.addLayout(self.vbox)
         self.hbox.addWidget(self.button)
         self.hbox.addSpacing(100)
@@ -102,8 +71,6 @@ class OrthosisGUI:
 
         self.widget.setLayout(self.hbox)
         self.widget.setGeometry(*geo)
-
-
 
     def show(self):
         self.widget.show()
@@ -114,7 +81,7 @@ class OrthosisGUI:
         """Calls RosService /myo/myo_muscle0_controller/set_reference to set Displacement """
         rospy.wait_for_service('/myo/myo_muscle0_controller/set_ref')
         try:
-            sDsp = rospy.ServiceProxy('/myo/myo_muscle0_controller/set_ref',SetReference)
+            sDsp = rospy.ServiceProxy('/myo/myo_muscle0_controller/set_ref',myo_msgs.srv.SetReference)
             sDsp(reference)
         except rospy.ServiceException, e:
             print " "
@@ -122,7 +89,7 @@ class OrthosisGUI:
     def setClutch(self):
         rospy.wait_for_service('/myo/myo_muscle0_controller/set_clt')
         try:
-            serv = rospy.ServiceProxy('/myo/myo_muscle0_controller/set_clt', SetClutch)
+            serv = rospy.ServiceProxy('/myo/myo_muscle0_controller/set_clt', myo_msgs.srv.SetClutch)
             self.state = serv(not(self.state)).clutchState
         except rospy.ServiceException, e:
             sys.exit("Error! Cant Set Clutch")
@@ -153,7 +120,6 @@ class OrthosisGUI:
             self.button.setValue(self.before - math.copysign(5.0,(self.before-self.button.value() ) ) )
         self.bar.setValue(self.button.value())
 
-        self.DataPlot.plotDataPoints(self.i,self.button.value())
         self.before =self.button.value()
         self.label.setText("<h1><b>" + str(self.button.value()*(15.0/1000.0 *93.0 *66.0 *0.5)) + " mNm </b></h1>")
         self.setReference(self.button.value())
