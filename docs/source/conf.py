@@ -341,3 +341,10 @@ texinfo_documents = [
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #
 # texinfo_no_detailmenu = False
+
+import sys
+import mock
+
+MOCK_MODULES = ['rospy','PySide','PySide.QtGui','PySide.QtCore', 'matplotlib','myo_msgs','myo_msgs.srv','myo_msgs.msg']
+for mod_name in MOCK_MODULES:
+    sys.modules.update((mod_name, mock.Mock()) for mod_name in MOCK_MODULES)

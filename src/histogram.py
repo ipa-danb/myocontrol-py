@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 import rospy
-from math import *
 import csv
-from myo_msgs.msg import statusMessage
+import myo_msgs.msg
 
 class simpleListener:
     def __init__(self):
@@ -65,7 +64,7 @@ class simpleListener:
         rospy.init_node('listener',anonymous=True)
         print "starting up logger ..."
 
-        rospy.Subscriber("/myo/myo_muscle0_controller/DebugMessage",statusMessage,self.callback)
+        rospy.Subscriber("/myo/myo_muscle0_controller/DebugMessage",myo_msgs.msg.statusMessage,self.callback)
 
         rospy.spin()
 

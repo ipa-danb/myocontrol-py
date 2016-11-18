@@ -1,9 +1,9 @@
 import rospy
-from math import *
 import time
 import csv
+import os
 import sys
-from myo_msgs.msg import statusMessage
+import myo_msgs.msg
 
 
 
@@ -77,7 +77,7 @@ class simpleLogger:
 
         rospy.init_node('logger',anonymous=True)
         print "\nstarting up logger ..."
-        self.subsC = rospy.Subscriber(rosNode,statusMessage,self.callback)
+        self.subsC = rospy.Subscriber(rosNode,myo_msgs.msg.statusMessage,self.callback)
 
     def __enter__(self):
         return self
