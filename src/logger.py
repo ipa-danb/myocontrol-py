@@ -1,6 +1,7 @@
 import rospy
 import time
 import csv
+import os
 import sys
 import myo_msgs.msg
 
