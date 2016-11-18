@@ -345,27 +345,6 @@ texinfo_documents = [
 import sys
 import mock
 
-MOCK_MODULES = ['rospy','pyside', 'matplotlib.figure','myo_msgs.srv','myo_msgs.msg', 'myo_msgs.srv.SetReference', 'myo_msgs.msg.statusMessage','myo_msgs.srv.SetClutch']
+MOCK_MODULES = ['rospy','pyside', 'matplotlib','myo_msgs.srv','myo_msgs.msg']
 for mod_name in MOCK_MODULES:
     sys.modules[mod_name] = mock.Mock()
-
-
-
-mock_qt_gui = mock.MagicMock(
-    QDialog=type('QDialog', (object,), {'__module__': 'PySide.QtGui'}),
-    QSortFilterProxyModel=type(
-        'QSortFilterProxyModel', (object,), {'__module__': 'PySide.QtGui'}
-     )
- )
-mock_qt_core = mock.MagicMock(
-    QAbstractItemModel=type(
-        'QAbstractItemModel', (object,), {'__module__': 'PySide.QtCore'}
-    )
-)
-
-sys.modules.update({
-    'PySide': mock.MagicMock(QtGui=mock_qt_gui, QtCore=mock_qt_core),
-    'PySide.QtGui': mock_qt_gui,
-    'PySide.QtCore': mock_qt_core,
-    'riffle.resource': mock.MagicMock()
-})
