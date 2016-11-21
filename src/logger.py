@@ -42,24 +42,22 @@ class simpleLogger:
         int32    clutchState
 
 
+    Parameters
+    ----------
+    name : string
+        Name for logging file
+    bufferSize : int
+        Size of logging buffer. After bufferSize samples the buffer is written to the file
+    rosNode : string
+        ROS Node that gets logged
+        Notes
+        -----
+        Needs to be to be of type statusMessage
+
+
     """
 
     def __init__(self,name, bufferSize=1000, rosNode="/myo/myo_muscle0_controller/DebugMessage"):
-        """Init function for simpleLogger class
-
-        Parameters
-        ----------
-        name : string
-            Name for logging file
-        bufferSize : int
-            Size of logging buffer. After bufferSize samples the buffer is written to the file
-        rosNode : string
-            ROS Node that gets logged
-            Notes
-            -----
-            Needs to be to be of type statusMessage
-
-        """
         # create filename from date
         timestr = time.strftime("%Y%m%d-%H%M%S")
         try:
@@ -76,22 +74,22 @@ class simpleLogger:
         self.buffer = []
 
         rospy.init_node('logger',anonymous=True)
-        print "\nstarting up logger ..."
+        print ("\nstarting up logger ...")
         self.subsC = rospy.Subscriber(rosNode,myo_msgs.msg.statusMessage,self.callback)
 
     def __enter__(self):
         return self
 
     def __exit__(self,exc_type, exc_val, exc_tb):
-        print "#####################"
-        print "stopping logger ... \n"
+        print ("#####################")
+        print ("stopping logger ... \n")
         self.dataSize += self.count
         with open(self.fileName,'a') as csvfile:
             writer = csv.writer(csvfile,delimiter='\t', quotechar='\'',quoting=csv.QUOTE_MINIMAL)
-            print '{:10s} {:10d}'.format('Final logged #Samples:',self.dataSize)
+            print ('{:10s} {:10d}'.format('Final logged #Samples:',self.dataSize))
             for row in self.buffer:
                 writer.writerow(row)
-        print "#####################\n"
+        print ("#####################\n")
         self.subsC.unregister()
 
 
@@ -105,6 +103,7 @@ class simpleLogger:
 
         Parameters
         ----------
+        
         data : <statusMessage>
             writes `data` to buffer
 
@@ -130,7 +129,7 @@ if __name__ == '__main__':
     if len(sys.argv) == 2:
         name = sys.argv[1]
     else:
-        print "Using standard name: data-[...]"
+        print ("Using standard name: data-[...]")
         name = "data"
 
     a = simpleLogger(name)
