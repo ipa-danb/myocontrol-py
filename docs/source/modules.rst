@@ -9,5 +9,4 @@ Module List
    histogram
    logger
    pyGUI_dispControl
-   trajectory
    trajectoryDisp
