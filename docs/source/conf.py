@@ -343,7 +343,7 @@ texinfo_documents = [
 # texinfo_no_detailmenu = False
 
 import sys
-import mock
+import unittest.mock as mock
 
 MOCK_MODULES = ['curses','rospy','PySide','PySide.QtGui','PySide.QtCore', 'matplotlib','myo_msgs','myo_msgs.srv','myo_msgs.msg']
 for mod_name in MOCK_MODULES:
