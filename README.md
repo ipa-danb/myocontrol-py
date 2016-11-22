@@ -1,6 +1,7 @@
 # myocontrol-py
 
-myocontrol python helper functions 
+myocontrol python helper functions
 
-so myocontrol_ros to adjust
-
+|     Service       |  Latest  |  Devel  |
+| ----------------- | -------- | ------- |
+| Documentation     | [![Documentation Status](https://readthedocs.org/projects/myocontrol-py/badge/?version=latest)](http://myocontrol-py.readthedocs.io/en/latest/) | [![Documentation Status](https://readthedocs.org/projects/myocontrol-py/badge/?version=devel)](http://myocontrol-py.readthedocs.io/en/devel/)

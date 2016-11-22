@@ -2,14 +2,9 @@
 # -'''- coding: utf-8 -'''-
 
 import sys
-
 import curses
 import rospy
-from myo_msgs.srv import SetReference
-
-#from PySide.QtCore import *
-#from PySide.QtGui import *
-#from PySide.QtDeclarative import QDeclarativeView
+import myo_msgs.srv
 
 ref = 0
 
@@ -28,7 +23,7 @@ def main(stdscr):
             stdscr.clear()
             stdscr.refresh()
             stdscr.move(0,0)
-            print ref
+            print (ref)
 
 
 
@@ -36,10 +31,10 @@ def setReference(reference):
     """Calls RosService /myo/myo_muscle0_controller/set_reference to set Displacement """
     rospy.wait_for_service('/myo/myo_muscle0_controller/set_ref')
     try:
-        sDsp = rospy.ServiceProxy('/myo/myo_muscle0_controller/set_ref',SetReference)
+        sDsp = rospy.ServiceProxy('/myo/myo_muscle0_controller/set_ref',myo_msgs.srv.SetReference)
         sDsp(reference)
-    except rospy.ServiceException, e:
-        print " "
+    except(rospy.ServiceException, e):
+        print (" ")
 
 if __name__ == "__main__":
     curses.wrapper(main)

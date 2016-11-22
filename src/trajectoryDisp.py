@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 import rospy
 import time
-from myo_msgs.srv import SetReference
-from myo_msgs.srv import SetClutch
-import sys, getopt
-import threading
+import myo_msgs.srv
+import sys
+import getopt
 import logger
 import csv
 
@@ -23,10 +22,10 @@ class TrajectoryMover:
         """Calls RosService /myo/myo_muscle0_controller/set_reference to set reference """
         rospy.wait_for_service('/myo/myo_muscle0_controller/set_ref')
         try:
-            sDsp = rospy.ServiceProxy('/myo/myo_muscle0_controller/set_ref',SetReference)
+            sDsp = rospy.ServiceProxy('/myo/myo_muscle0_controller/set_ref',myo_msgs.srv.SetReference)
             sDsp(ref)
-        except rospy.ServiceException, e:
-            print " "
+        except(rospy.ServiceException, e):
+            print(" ")
 
 
     def checkFile(self):
@@ -56,9 +55,9 @@ class TrajectoryMover:
     def setClutch(self,state):
         rospy.wait_for_service('/myo/myo_muscle0_controller/set_clt')
         try:
-            serv = rospy.ServiceProxy('/myo/myo_muscle0_controller/set_clt', SetClutch)
+            serv = rospy.ServiceProxy('/myo/myo_muscle0_controller/set_clt', myo_msgs.srv.SetClutch)
             serv(state)
-        except rospy.ServiceException, e:
+        except(rospy.ServiceException, e):
             sys.exit("Error! Cant Set Clutch")
 
 
@@ -67,10 +66,10 @@ class TrajectoryMover:
         self.checkFile()
 
     def traj(self):
-        print " "
-        print "###############################"
-        print "Starting to drive trajectory..."
-        print "###############################\n"
+        print(" ")
+        print("###############################")
+        print("Starting to drive trajectory...")
+        print("###############################\n")
         with open(self.directory + '/' +self.trajFileName,'rb') as csvfile:
             trajReader = csv.reader(csvfile,delimiter=',',quotechar='|')
             for row in trajReader:
@@ -79,24 +78,24 @@ class TrajectoryMover:
                 self.commands.get(row[0])[2](float(row[1]))
                 if len(row) > 2:
                     time.sleep(float(row[2]))
-        print "\n"
-        print "###############################"
-        print "finished with trajectory"
-        print "###############################"
-        print "\n"
+        print("\n")
+        print("###############################")
+        print("finished with trajectory")
+        print("###############################")
+        print("\n")
 
     def driveTrajectory(self):
         self.checkFile()
-        print "\n"
+        print("\n")
         if self.logFileName == None:
-            print "###############################"
-            print "No logger specified ..."
-            print "###############################"
+            print("###############################")
+            print("No logger specified ...")
+            print("###############################")
             self.traj()
         else:
-            print "###############################"
-            print "setting up logger with file " + self.logFileName + " ..."
-            print "###############################"
+            print("###############################")
+            print("setting up logger with file " + self.logFileName + " ...")
+            print("###############################")
             with logger.simpleLogger(self.logFileName,self.bufferSize) as log:
                 self.traj()
 
@@ -118,11 +117,11 @@ if __name__ == '__main__':
     try:
         opts, args = getopt.getopt(sys.argv[1:],"hf:b:t:",["trajectoryFile=","help","file=","buffer="])
     except getopt.GetoptError:
-        print 'test.py -i <inputfile> -o <outputfile>'
+        print('test.py -i <inputfile> -o <outputfile>')
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print 'trajectoryDisp.py -t <trajectoryFile> -f <logfilename> -b <logbuffer>'
+            print('trajectoryDisp.py -t <trajectoryFile> -f <logfilename> -b <logbuffer>')
             sys.exit()
         elif opt in ("-f", "--file"):
             name = str(arg)

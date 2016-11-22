@@ -9,10 +9,11 @@ MYO Robotics Python Package Documentation
 Contents:
 
 .. toctree::
-   :maxdepth: 2
-   
-   about
+   :maxdepth: 1
 
+   examples
+   modules
+   about
 
 Indices and tables
 ==================

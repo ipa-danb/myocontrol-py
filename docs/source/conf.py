@@ -16,9 +16,9 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
+import os
+import sys
+sys.path.insert(0, os.path.abspath('../../src'))
 
 # -- General configuration ------------------------------------------------
 
@@ -31,6 +31,7 @@
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx.ext.napoleon',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -340,3 +341,13 @@ texinfo_documents = [
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #
 # texinfo_no_detailmenu = False
+
+import sys
+if sys.version_info < (3,0):
+    import mock
+else:
+    import unittest.mock as mock
+
+MOCK_MODULES = ['curses','rospy','PySide','PySide.QtGui','PySide.QtCore', 'matplotlib','myo_msgs','myo_msgs.srv','myo_msgs.msg']
+for mod_name in MOCK_MODULES:
+    sys.modules.update((mod_name, mock.Mock()) for mod_name in MOCK_MODULES)

@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 import rospy
-from math import *
 import csv
-from myo_msgs.msg import statusMessage
+import myo_msgs.msg
 
 class simpleListener:
     def __init__(self):
@@ -40,10 +39,9 @@ class simpleListener:
         self.bucket[self.nrBins//2 + tmp] += 1
 
         if self.count > 10000:
-            print "-------------------------------------"
-            print "----------- New Histogram -----------"
-            print "-------------------------------------"
-            print " "
+            print ("-------------------------------------")
+            print ("----------- New Histogram -----------")
+            print ("-------------------------------------\n")
             self.count = 0
             for i in xrange(0,(self.nrBins)/2+1):
                 print ((i-self.nrBins//2)*self.binSizeT/1000) , " us : " , self.bucket[i] , " | " , ( -1*(i-self.nrBins//2)*self.binSizeT/1000 ) , " us : " , self.bucket[self.nrBins -i]
@@ -63,9 +61,9 @@ class simpleListener:
 
     def listener(self):
         rospy.init_node('listener',anonymous=True)
-        print "starting up logger ..."
+        print ("starting up logger ...")
 
-        rospy.Subscriber("/myo/myo_muscle0_controller/DebugMessage",statusMessage,self.callback)
+        rospy.Subscriber("/myo/myo_muscle0_controller/DebugMessage",myo_msgs.msg.statusMessage,self.callback)
 
         rospy.spin()
 
