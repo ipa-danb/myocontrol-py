@@ -23,7 +23,7 @@ def main(stdscr):
             stdscr.clear()
             stdscr.refresh()
             stdscr.move(0,0)
-            print ref
+            print (ref)
 
 
 
@@ -33,8 +33,8 @@ def setReference(reference):
     try:
         sDsp = rospy.ServiceProxy('/myo/myo_muscle0_controller/set_ref',myo_msgs.srv.SetReference)
         sDsp(reference)
-    except rospy.ServiceException, e:
-        print " "
+    except(rospy.ServiceException, e):
+        print (" ")
 
 if __name__ == "__main__":
     curses.wrapper(main)

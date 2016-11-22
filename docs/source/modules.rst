@@ -1,5 +1,5 @@
-src
-===
+Module List
+=============
 
 .. toctree::
    :maxdepth: 4
@@ -9,5 +9,4 @@ src
    histogram
    logger
    pyGUI_dispControl
-   trajectory
    trajectoryDisp

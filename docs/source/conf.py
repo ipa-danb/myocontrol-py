@@ -343,8 +343,11 @@ texinfo_documents = [
 # texinfo_no_detailmenu = False
 
 import sys
-import mock
+if sys.version_info < (3,0):
+    import mock
+else:
+    import unittest.mock as mock
 
-MOCK_MODULES = ['rospy','PySide','PySide.QtGui','PySide.QtCore', 'matplotlib','myo_msgs','myo_msgs.srv','myo_msgs.msg']
+MOCK_MODULES = ['curses','rospy','PySide','PySide.QtGui','PySide.QtCore', 'matplotlib','myo_msgs','myo_msgs.srv','myo_msgs.msg']
 for mod_name in MOCK_MODULES:
     sys.modules.update((mod_name, mock.Mock()) for mod_name in MOCK_MODULES)
