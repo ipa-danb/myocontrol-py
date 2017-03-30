@@ -60,11 +60,8 @@ class simpleLogger:
     def __init__(self,name, bufferSize=1000, rosNode="/myo/myo_muscle0_controller/DebugMessage"):
         # create filename from date
         timestr = time.strftime("%Y%m%d-%H%M%S")
-        try:
-            os.mkdir("data")
-        except Exception:
-            pass
-        self.fileName =  "data/" + name + "-" + timestr
+
+        self.fileName =  name + "-" + timestr
         with open(self.fileName,'wb') as csvfile:
             writer = csv.writer(csvfile,delimiter='\t', quotechar='\'',quoting=csv.QUOTE_MINIMAL)
             writer.writerow( [ "time.nsecs", "time.secs", "position", "velocity", "displacement", "reference", "current","commanded_effort","analogIN0",'clutchState' ] )
@@ -73,7 +70,8 @@ class simpleLogger:
         self.count = 0
         self.buffer = []
 
-        rospy.init_node('logger',anonymous=True)
+        # Calling this logger from seperate Threads requires to disable signals catching (ctrl + c mainly)
+        rospy.init_node('logger',anonymous=True,disable_signals=True)
         print ("\nstarting up logger ...")
         self.subsC = rospy.Subscriber(rosNode,myo_msgs.msg.statusMessage,self.callback)
 
@@ -103,7 +101,7 @@ class simpleLogger:
 
         Parameters
         ----------
-        
+
         data : <statusMessage>
             writes `data` to buffer
 
@@ -132,7 +130,7 @@ if __name__ == '__main__':
         print ("Using standard name: data-[...]")
         name = "data"
 
-    a = simpleLogger(name)
+    a = simpleLogger('/home/ronexros/workspace/data/' + name)
 
     # keep process alive
     rospy.spin()
