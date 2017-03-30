@@ -6,14 +6,15 @@ import sys
 import getopt
 import logger
 import csv
+import time
 
 class TrajectoryMover:
-    def __init__(self,bufferSize=1000,fileName="traj_1",directory="scripts",logFileName=None):
+    def __init__(self,bufferSize=1000,fileName="traj_1",logFileName=None):
         self.trajFileName = fileName
         self.maxLines = 0
-        self.directory = directory
+        self.correctFlag = False
         self.bufferSize = bufferSize
-        self.commands = {"mov": ('c',(5,200),self.setReference), "clt" : ('s',(0,1),self.setClutch) }
+        self.commands = {"mov": ('c',(3,500),self.setReference), "clt" : ('s',(0,1),self.setClutch) }
         self.logFileName = logFileName
         self.checkFile()
 
@@ -29,27 +30,34 @@ class TrajectoryMover:
 
 
     def checkFile(self):
-        with open('scripts/' +self.trajFileName,'rb') as csvfile:
-            trajReader = csv.reader(csvfile,delimiter=',',quotechar='|')
-            for row in trajReader:
-                # check if command is known
-                if not self.commands.has_key(row[0]):
-                    raise Exception("command unknown: " + str(row[0]) + " at Line " + str(trajReader.line_num))
+        try:
+            with open(self.trajFileName,'rb') as csvfile:
+                trajReader = csv.reader(csvfile,delimiter=',',quotechar='|')
+                for row in trajReader:
+                    # check if command is known
+                    if not self.commands.has_key(row[0]):
+                        raise Exception("command unknown: " + str(row[0]) + " at Line " + str(trajReader.line_num))
 
-                # check if command is in bounds
-                bounds = self.commands.get(row[0])
-                if bounds[0] == 'c':
-                    if not ( float(row[1]) >= bounds[1][0] and float(row[1]) <= bounds[1][1] ):
-                        raise Exception("command not in bound: " + str(row) + " vs bounds " + str(bounds[1][0:2]) + " in Line " + str(trajReader.line_num) )
-                elif bounds[0] == 's':
-                    if not ( float(row[1]) in bounds[1] ):
-                        raise Exception("command not accepted value: " + str(row[1]) + " not in " + str(bounds[1]) + " in Line " + str(trajReader.line_num) )
+                    # check if command is in bounds
+                    bounds = self.commands.get(row[0])
+                    if bounds[0] == 'c':
+                        if not ( float(row[1]) >= bounds[1][0] and float(row[1]) <= bounds[1][1] ):
+                            raise Exception("command not in bound: " + str(row) + " vs bounds " + str(bounds[1][0:2]) + " in Line " + str(trajReader.line_num) )
+                    elif bounds[0] == 's':
+                        if not ( float(row[1]) in bounds[1] ):
+                            raise Exception("command not accepted value: " + str(row[1]) + " not in " + str(bounds[1]) + " in Line " + str(trajReader.line_num) )
 
-                # check if time is in bound
-                if len(row) > 2:
-                    if (float(row[2]) < 0):
-                        raise Exception("wait time lower than 0 in Line: " + str(trajReader.line_num))
-            self.maxLines = trajReader.line_num
+                    # check if time is in bound
+                    if len(row) > 2:
+                        if (float(row[2]) < 0):
+                            raise Exception("wait time lower than 0 in Line: " + str(trajReader.line_num))
+                self.maxLines = trajReader.line_num
+            self.correctFlag = True
+            return True
+        except Exception as ex:
+            print(ex)
+            self.correctFlag = False
+            return False
 
 
     def setClutch(self,state):
@@ -63,56 +71,70 @@ class TrajectoryMover:
 
     def setTrajectoryFile(self, filename):
         self.trajFileName = filename
-        self.checkFile()
+        if self.checkFile():
+            return True
+        else:
+            self.trajFileName = None
+            return False
 
     def traj(self):
-        print(" ")
-        print("###############################")
-        print("Starting to drive trajectory...")
-        print("###############################\n")
-        with open(self.directory + '/' +self.trajFileName,'rb') as csvfile:
-            trajReader = csv.reader(csvfile,delimiter=',',quotechar='|')
-            for row in trajReader:
-                print('\rLines: {:4d} / {:4d} : {:20s}'.format(trajReader.line_num,self.maxLines,str(row[0]) + " : " + str(row[1]) )),
-                sys.stdout.flush()
-                self.commands.get(row[0])[2](float(row[1]))
-                if len(row) > 2:
-                    time.sleep(float(row[2]))
-        print("\n")
-        print("###############################")
-        print("finished with trajectory")
-        print("###############################")
-        print("\n")
+        if self.correctFlag:
+            print(" ")
+            print("###############################")
+            print("Starting to drive trajectory...")
+            print("###############################\n")
+            with open(self.trajFileName,'rb') as csvfile:
+                trajReader = csv.reader(csvfile,delimiter=',',quotechar='|')
+                for row in trajReader:
+                    t1 = time.time()
+                    print('\rLines: {:4d} / {:4d} : {:20s}'.format(trajReader.line_num,self.maxLines,str(row[0]) + " : " + str(row[1]) )),
+                    sys.stdout.flush()
+                    self.commands.get(row[0])[2](float(row[1]))
+                    if len(row) > 2:
+                        time.sleep(max(float(row[2])-(time.time() -t1),0))
+                    yield int(100*float(trajReader.line_num)/float(self.maxLines))
+            print("\n")
+            print("###############################")
+            print("finished with trajectory")
+            print("###############################")
+            print("\n")
+        else:
+            print("\n")
+            print("###############################")
+            print("No correct Trajectory File found")
+            print("###############################")
+            print("\n")
 
     def driveTrajectory(self):
         self.checkFile()
         print("\n")
+        t1 = time.time()
         if self.logFileName == None:
             print("###############################")
             print("No logger specified ...")
             print("###############################")
-            self.traj()
+            it = self.traj()
+            for i in it:
+                print(i)
         else:
             print("###############################")
             print("setting up logger with file " + self.logFileName + " ...")
             print("###############################")
             with logger.simpleLogger(self.logFileName,self.bufferSize) as log:
-                self.traj()
+                it = self.traj()
+                for i in it:
+                    print(i)
+        print('Endtime: ' + str(time.time() -t1))
 
 
-
-    def changeDirectory(self,directory):
-        self.directory = directory
 
 if __name__ == '__main__':
 
     # default parameter
     name = ""
+    trajFileDefaultDirectory = "/home/ronexros/workspace/scripts"
     trajFileName = "traj_1"
     bufferSize = 2000
-    maxRef      = 120
-    minRef      = 10
-    t_total     = 60
 
     try:
         opts, args = getopt.getopt(sys.argv[1:],"hf:b:t:",["trajectoryFile=","help","file=","buffer="])
@@ -130,5 +152,6 @@ if __name__ == '__main__':
         elif opt in ("-t", "--trajectoryFile"):
             trajFileName = str(arg)
 
+    trajFileName = '/home/ronexros/workspace/scripts/' + trajFileName
     t = TrajectoryMover(bufferSize=bufferSize,fileName=trajFileName,logFileName=name )
     t.driveTrajectory()
